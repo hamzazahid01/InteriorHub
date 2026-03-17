@@ -1,0 +1,98 @@
+.header {
+  padding: 28px 0 18px;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: var(--textStrong);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.searchRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 10px 0 14px;
+}
+
+.searchInput {
+  flex: 1;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--textStrong);
+  border-radius: 14px;
+  padding: 12px 14px;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: rgba(79, 70, 229, 0.55);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 18px;
+}
+
+.filterBtn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--textStrong);
+  border-radius: 999px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 650;
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.05);
+}
+
+.filterBtn:hover {
+  background: var(--surface2);
+}
+
+.active {
+  background: var(--surface2);
+}
+
+.loadMoreRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 0 26px;
+}
+
+.loadMoreText {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding-bottom: 16px;
+}
+
+/* Product cards are now handled by ProductCard component */
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+

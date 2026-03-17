@@ -1,0 +1,188 @@
+.page {
+  padding: 28px 0 40px;
+  display: grid;
+  gap: 22px;
+}
+
+.header {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 18px 46px rgba(2, 6, 23, 0.06);
+}
+
+.title {
+  margin: 0 0 10px;
+  font-size: 34px;
+  letter-spacing: -0.03em;
+  color: var(--textStrong);
+}
+
+.lead {
+  margin: 0 0 10px;
+  color: var(--text);
+  max-width: 75ch;
+}
+
+.lead:last-child {
+  margin-bottom: 0;
+}
+
+.section {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 18px 46px rgba(2, 6, 23, 0.06);
+}
+
+.sectionTitle {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: var(--textStrong);
+  letter-spacing: -0.02em;
+}
+
+.whyGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.whyCard {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  padding: 12px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.whyDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.26);
+  border: 1px solid rgba(79, 70, 229, 0.22);
+  flex: 0 0 auto;
+}
+
+.whyText {
+  color: var(--textStrong);
+  font-weight: 650;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.contactCard {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.contactLabel {
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.contactValue {
+  color: var(--textStrong);
+  text-decoration: none;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.contactValue:hover {
+  text-decoration: underline;
+  text-decoration-color: rgba(15, 23, 42, 0.25);
+  text-underline-offset: 4px;
+}
+
+.contactHint {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.ctaRow {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+  align-items: center;
+}
+
+.whatsappBtn {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 800;
+  text-decoration: none;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--textStrong);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.08);
+  transition: transform 120ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.whatsappBtn:hover {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.40);
+}
+
+.whatsappBtn:active {
+  transform: translateY(1px);
+}
+
+.ctaNote {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .whyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .contactGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .whatsappBtn {
+    width: 100%;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .header,
+  .section {
+    background: rgba(15, 22, 45, 0.74);
+  }
+
+  .whyCard,
+  .contactCard {
+    background: rgba(15, 22, 45, 0.68);
+  }
+
+  .contactValue:hover {
+    text-decoration-color: rgba(226, 232, 240, 0.25);
+  }
+}
+
