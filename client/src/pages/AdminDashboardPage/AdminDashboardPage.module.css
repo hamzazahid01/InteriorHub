@@ -1,0 +1,51 @@
+.title {
+  margin: 8px 0 6px;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: var(--textStrong);
+}
+
+.subTitle {
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+.muted {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 16px 36px rgba(2, 6, 23, 0.06);
+}
+
+.label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.value {
+  margin-top: 10px;
+  font-weight: 800;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  color: var(--textStrong);
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+

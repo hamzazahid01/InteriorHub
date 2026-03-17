@@ -1,0 +1,164 @@
+.card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+  min-height: 100%;
+}
+
+.link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+.imageWrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--surface2);
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.01);
+}
+
+.dots {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+.dotActive {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.navBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(15, 23, 42, 0.28);
+  color: white;
+  font-size: 18px;
+  line-height: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.left {
+  left: 10px;
+}
+.right {
+  right: 10px;
+}
+
+.imageWrap:hover .navBtn {
+  display: inline-flex;
+}
+
+.body {
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.25;
+  color: var(--textStrong);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.price {
+  margin: 0;
+  font-weight: 800;
+  color: var(--textStrong);
+  white-space: nowrap;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stars {
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--textStrong);
+}
+
+.ratingText {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cta {
+  margin-top: 2px;
+  color: var(--textStrong);
+  font-weight: 700;
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+@media (max-width: 560px) {
+  .navBtn {
+    display: inline-flex;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .dot {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(15, 22, 45, 0.55);
+  }
+  .dotActive {
+    background: rgba(15, 22, 45, 0.92);
+  }
+}
+

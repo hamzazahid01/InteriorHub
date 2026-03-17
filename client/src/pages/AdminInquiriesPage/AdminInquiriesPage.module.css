@@ -1,0 +1,187 @@
+.title {
+  margin: 8px 0 6px;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: var(--textStrong);
+}
+
+.subTitle {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+
+.muted {
+  margin: 8px 0 12px;
+  color: var(--muted);
+}
+
+.tableWrap {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.06);
+}
+
+.mobileList {
+  display: none;
+}
+
+.mobileEmpty {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 14px;
+  color: var(--muted);
+}
+
+.mobileCard {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.06);
+  display: grid;
+  gap: 10px;
+}
+
+.mobileTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mobileTitle {
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  color: var(--textStrong);
+}
+
+.mobileSub {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.mobileBadge {
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--textStrong);
+  border-radius: 999px;
+  padding: 8px 10px;
+  font-weight: 750;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.mobileRow {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.mobileLabel {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.mobileValue {
+  color: var(--textStrong);
+  font-weight: 700;
+}
+
+.mobileMessage {
+  color: var(--text);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+.table thead th {
+  text-align: left;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface2);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table tbody td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: top;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.customerCell {
+  color: var(--textStrong);
+  font-weight: 750;
+  min-width: 160px;
+}
+
+.phoneCell {
+  min-width: 140px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.productCell {
+  min-width: 180px;
+  color: var(--textStrong);
+}
+
+.messageCell {
+  min-width: 260px;
+}
+
+.dateCell {
+  min-width: 170px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.smallMuted {
+  color: var(--muted);
+}
+
+.empty {
+  padding: 22px 14px;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .messageCell {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 720px) {
+  .tableWrap {
+    display: none;
+  }
+
+  .mobileList {
+    display: grid;
+    gap: 12px;
+  }
+
+  .mobileRow {
+    grid-template-columns: 78px 1fr;
+  }
+}
+

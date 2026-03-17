@@ -1,0 +1,20 @@
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  margin-top: 48px;
+}
+
+.inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
