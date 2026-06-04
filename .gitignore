@@ -1,0 +1,9 @@
+# Ignore local environment files containing secrets
+server/.env
+
+# Ignore local dependency installations
+client/node_modules/
+server/node_modules/
+
+# Ignore local archive/artifact files
+server.zip
