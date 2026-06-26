@@ -193,25 +193,29 @@ export default function ProductDetailPage() {
 
   const main = product.mainImage || product.image || images[0] || "";
   const normalizedImages = main ? [main, ...images.filter((u) => u !== main)] : images;
-  const currentImage = normalizedImages[activeIdx] || main || images[0] || "";
+  const mediaItems = [
+    ...normalizedImages.map((url) => ({ type: "image", url })),
+    ...(product.video ? [{ type: "video", url: product.video }] : []),
+  ];
+  const currentMedia = mediaItems[activeIdx] || null;
 
   function prev() {
-    if (!normalizedImages.length) return;
-    setActiveIdx((i) => (i - 1 + normalizedImages.length) % normalizedImages.length);
+    if (!mediaItems.length) return;
+    setActiveIdx((i) => (i - 1 + mediaItems.length) % mediaItems.length);
   }
 
   function next() {
-    if (!normalizedImages.length) return;
-    setActiveIdx((i) => (i + 1) % normalizedImages.length);
+    if (!mediaItems.length) return;
+    setActiveIdx((i) => (i + 1) % mediaItems.length);
   }
 
   function onTouchStart(e) {
-    if (normalizedImages.length <= 1) return;
+    if (mediaItems.length <= 1) return;
     touchStartX.current = e.touches?.[0]?.clientX ?? null;
   }
 
   function onTouchEnd(e) {
-    if (normalizedImages.length <= 1) return;
+    if (mediaItems.length <= 1) return;
     const startX = touchStartX.current;
     if (startX == null) return;
     const endX = e.changedTouches?.[0]?.clientX ?? null;
@@ -261,16 +265,26 @@ export default function ProductDetailPage() {
               onTouchStart={onTouchStart}
               onTouchEnd={onTouchEnd}
             >
-              <img
-                className={styles.image}
-                src={
-                  resolveImageUrl(currentImage || main) ||
-                  "https://placehold.co/1200x900?text=InteriorHub"
-                }
-                alt={productImageAlt(product, { variant: "main", index: activeIdx })}
-              />
+              {currentMedia?.type === "video" ? (
+                <video
+                  className={styles.image}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  src={resolveImageUrl(currentMedia.url)}
+                />
+              ) : (
+                <img
+                  className={styles.image}
+                  src={
+                    resolveImageUrl(currentMedia?.url || main) ||
+                    "https://placehold.co/1200x900?text=InteriorHub"
+                  }
+                  alt={productImageAlt(product, { variant: "main", index: activeIdx })}
+                />
+              )}
 
-              {normalizedImages.length > 1 && (
+              {mediaItems.length > 1 && (
                 <div className={styles.galleryControls}>
                   <button type="button" className={styles.galleryBtn} onClick={prev}>
                     Prev
@@ -282,11 +296,11 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {normalizedImages.length > 1 && (
-              <div className={styles.thumbs} aria-label="Product images">
-                {normalizedImages.map((url, idx) => (
+            {mediaItems.length > 1 && (
+              <div className={styles.thumbs} aria-label="Product media">
+                {mediaItems.map((item, idx) => (
                   <button
-                    key={`${url}-${idx}`}
+                    key={`${item.type}-${item.url || idx}-${idx}`}
                     type="button"
                     className={
                       idx === activeIdx
@@ -295,12 +309,18 @@ export default function ProductDetailPage() {
                     }
                     onClick={() => setActiveIdx(idx)}
                   >
-                    <img
-                      className={styles.thumbImg}
-                      src={resolveImageUrl(url)}
-                      alt={productImageAlt(product, { variant: "thumb", index: idx })}
-                      loading="lazy"
-                    />
+                    {item.type === "video" ? (
+                      <div className={styles.videoThumb}>
+                        <span className={styles.videoThumbLabel}>Video</span>
+                      </div>
+                    ) : (
+                      <img
+                        className={styles.thumbImg}
+                        src={resolveImageUrl(item.url)}
+                        alt={productImageAlt(product, { variant: "thumb", index: idx })}
+                        loading="lazy"
+                      />
+                    )}
                   </button>
                 ))}
               </div>
@@ -326,9 +346,11 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <p className={styles.description}>
-            {product.description || "No description provided yet."}
-          </p>
+          <div className={styles.descriptionBlock}>
+            <p className={styles.description}>
+              {product.description || "No description provided yet."}
+            </p>
+          </div>
 
           <div className={styles.panel}>
             <h2 className={styles.panelTitle}>Details</h2>

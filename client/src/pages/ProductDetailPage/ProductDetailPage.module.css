@@ -107,6 +107,25 @@
   display: block;
 }
 
+.videoThumb {
+  width: 100%;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.85));
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.videoThumbLabel {
+  padding: 4px 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 999px;
+}
+
 .image {
   width: 100%;
   height: 100%;
@@ -169,9 +188,19 @@
   color: var(--textStrong);
 }
 
-.description {
+.descriptionBlock {
   margin: 0 0 18px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.description {
+  margin: 0;
   color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
 }
 
 .panel {

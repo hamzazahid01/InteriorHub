@@ -19,8 +19,12 @@ export default function AdminProductsPage() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [existingImages, setExistingImages] = useState([]);
+  const [existingVideo, setExistingVideo] = useState("");
   const [newFiles, setNewFiles] = useState([]);
   const [newPreviews, setNewPreviews] = useState([]);
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoPreview, setVideoPreview] = useState("");
+  const [removeVideo, setRemoveVideo] = useState(false);
   const [mainChoice, setMainChoice] = useState({ type: "new", index: 0 }); // {type:'existing'|'new', index:number}
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -62,8 +66,12 @@ export default function AdminProductsPage() {
     setEditingId(null);
     setForm(emptyForm);
     setExistingImages([]);
+    setExistingVideo("");
     setNewFiles([]);
     setNewPreviews([]);
+    setVideoFile(null);
+    setVideoPreview("");
+    setRemoveVideo(false);
     setMainChoice({ type: "new", index: 0 });
     setFormOpen(true);
   }
@@ -81,8 +89,12 @@ export default function AdminProductsPage() {
     });
     const imgs = Array.isArray(p.images) && p.images.length ? p.images : p.image ? [p.image] : [];
     setExistingImages(imgs);
+    setExistingVideo(p.video || "");
     setNewFiles([]);
     setNewPreviews([]);
+    setVideoFile(null);
+    setVideoPreview("");
+    setRemoveVideo(false);
     const main = p.mainImage || p.image || imgs[0] || "";
     const existingIndex = main ? imgs.indexOf(main) : -1;
     if (existingIndex >= 0) setMainChoice({ type: "existing", index: existingIndex });
@@ -99,8 +111,12 @@ export default function AdminProductsPage() {
     setError("");
     setSuccess("");
     setExistingImages([]);
+    setExistingVideo("");
     setNewFiles([]);
     setNewPreviews([]);
+    setVideoFile(null);
+    setVideoPreview("");
+    setRemoveVideo(false);
     setMainChoice({ type: "new", index: 0 });
   }
 
@@ -116,12 +132,28 @@ export default function AdminProductsPage() {
     };
   }, [newFiles]);
 
+  useEffect(() => {
+    if (!videoFile) {
+      setVideoPreview("");
+      return;
+    }
+    const url = URL.createObjectURL(videoFile);
+    setVideoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [videoFile]);
+
   function onSelectFiles(fileList) {
     const files = Array.from(fileList || []).slice(0, 5);
     setNewFiles(files);
     if (files.length && mainChoice.type !== "existing") {
       setMainChoice({ type: "new", index: 0 });
     }
+  }
+
+  function onSelectVideo(fileList) {
+    const file = fileList && fileList[0] ? fileList[0] : null;
+    setVideoFile(file);
+    setRemoveVideo(false);
   }
 
   function removeExisting(index) {
@@ -153,12 +185,8 @@ export default function AdminProductsPage() {
     }
 
     const totalImages = existingImages.length + newFiles.length;
-    if (mode === "create" && newFiles.length === 0) {
-      setError("Please upload at least 1 image.");
-      return;
-    }
-    if (totalImages === 0) {
-      setError("Please keep at least 1 image.");
+    if (totalImages === 0 && !videoFile && !existingVideo) {
+      setError("Please upload at least 1 image or video.");
       return;
     }
     if (totalImages > 5) {
@@ -172,7 +200,10 @@ export default function AdminProductsPage() {
     fd.append("description", form.description.trim());
     fd.append("category", form.category);
     fd.append("existingImages", JSON.stringify(existingImages));
+    fd.append("existingVideo", existingVideo || "");
+    fd.append("removeVideo", String(removeVideo));
     newFiles.forEach((f) => fd.append("images", f));
+    if (videoFile) fd.append("videos", videoFile);
 
     if (mainChoice.type === "existing") {
       fd.append("mainImage", existingImages[mainChoice.index] || "");
@@ -191,8 +222,12 @@ export default function AdminProductsPage() {
       setSuccess(mode === "edit" ? "Product updated successfully." : "Product created successfully.");
       setForm(emptyForm);
       setExistingImages([]);
+      setExistingVideo("");
       setNewFiles([]);
       setNewPreviews([]);
+      setVideoFile(null);
+      setVideoPreview("");
+      setRemoveVideo(false);
       setMainChoice({ type: "new", index: 0 });
     } catch (err) {
       setError(err?.response?.data?.message || "Something went wrong. Please try again.");
@@ -218,6 +253,7 @@ export default function AdminProductsPage() {
       const fd = new FormData();
       fd.append("isFeatured", String(!p.isFeatured));
       fd.append("existingImages", JSON.stringify(p.images && p.images.length ? p.images : p.image ? [p.image] : []));
+      fd.append("existingVideo", p.video || "");
       fd.append("mainImage", p.mainImage || p.image || "");
       await api.put(`/api/products/${p._id}`, fd);
       setProducts((prev) =>
@@ -378,8 +414,9 @@ export default function AdminProductsPage() {
             {error && <div className={styles.errorBox}>{error}</div>}
             {success && <div className={styles.successBox}>{success}</div>}
 
-            <form className={styles.form} onSubmit={handleSubmit}>
-              <div className={styles.grid}>
+            <div className={styles.modalBody}>
+              <form className={styles.form} onSubmit={handleSubmit}>
+                <div className={styles.grid}>
                 <div className={styles.field}>
                   <label className={styles.label} htmlFor="p-name">
                     Name
@@ -449,6 +486,20 @@ export default function AdminProductsPage() {
                     multiple
                     accept="image/*"
                     onChange={(e) => onSelectFiles(e.target.files)}
+                    disabled={saving}
+                  />
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="p-video">
+                    Product Video (optional)
+                  </label>
+                  <input
+                    id="p-video"
+                    className={styles.input}
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => onSelectVideo(e.target.files)}
                     disabled={saving}
                   />
                 </div>
@@ -557,6 +608,43 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
+              <div className={styles.previewWrap}>
+                <div className={styles.previewHeader}>
+                  <div className={styles.previewTitle}>Video</div>
+                  <div className={styles.previewText}>
+                    Upload a video or keep an existing one. The video URL is stored in the database.
+                  </div>
+                </div>
+
+                {(existingVideo || videoPreview) && (
+                  <div className={styles.videoPreviewCard}>
+                    {videoPreview ? (
+                      <video className={styles.videoPreview} controls src={videoPreview} />
+                    ) : (
+                      <video className={styles.videoPreview} controls src={resolveImageUrl(existingVideo)} />
+                    )}
+                    <div className={styles.videoActions}>
+                      <button
+                        type="button"
+                        className={styles.smallBtn}
+                        onClick={() => {
+                          setVideoFile(null);
+                          setVideoPreview("");
+                          setRemoveVideo(true);
+                        }}
+                        disabled={saving}
+                      >
+                        Remove Video
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {!existingVideo && !videoPreview && (
+                  <div className={styles.previewPlaceholder}>No video selected</div>
+                )}
+              </div>
+
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="p-desc">
                   Description
@@ -574,19 +662,20 @@ export default function AdminProductsPage() {
                 />
               </div>
 
-              <div className={styles.modalActions}>
-                <button className="btn btnPrimary" type="submit" disabled={saving}>
-                  {saving
-                    ? "Uploading…"
-                    : mode === "edit"
-                      ? "Update Product"
-                      : "Create Product"}
-                </button>
-                <button className="btn btnGhost" type="button" onClick={closeForm} disabled={saving}>
-                  Close
-                </button>
-              </div>
-            </form>
+                <div className={styles.modalActions}>
+                  <button className="btn btnPrimary" type="submit" disabled={saving}>
+                    {saving
+                      ? "Uploading…"
+                      : mode === "edit"
+                        ? "Update Product"
+                        : "Create Product"}
+                  </button>
+                  <button className="btn btnGhost" type="button" onClick={closeForm} disabled={saving}>
+                    Close
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

@@ -19,8 +19,24 @@ router.get("/", getProducts);
 router.get("/:id", getProductById);
 router.post("/:id/rate", addRating);
 router.get("/:id/ratings", getRatings);
-router.post("/", protect, upload.array("images", 5), createProduct);
-router.put("/:id", protect, upload.array("images", 5), updateProduct);
+router.post(
+  "/",
+  protect,
+  upload.fields([
+    { name: "images", maxCount: 5 },
+    { name: "videos", maxCount: 1 },
+  ]),
+  createProduct
+);
+router.put(
+  "/:id",
+  protect,
+  upload.fields([
+    { name: "images", maxCount: 5 },
+    { name: "videos", maxCount: 1 },
+  ]),
+  updateProduct
+);
 router.delete("/:id", protect, deleteProduct);
 
 module.exports = router;

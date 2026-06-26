@@ -13,6 +13,7 @@ function normalizeLegacyImages(p) {
     images: finalImages,
     mainImage,
     image: obj.image || mainImage, // keep legacy field populated
+    video: obj.video || "",
   };
 }
 
@@ -65,7 +66,7 @@ async function getProducts(req, res) {
     const wantsPaged = page !== undefined || limit !== undefined;
 
     const baseQuery = Product.find(filter)
-      .select("name price description images mainImage image category isFeatured averageRating createdAt")
+      .select("name price description images mainImage image video category isFeatured averageRating createdAt")
       .populate("category", "name")
       .sort({ createdAt: -1 });
 
@@ -138,22 +139,25 @@ async function createProduct(req, res) {
       return res.status(400).json({ message: "category is required" });
     }
 
-    const files = Array.isArray(req.files) ? req.files : [];
-    if (files.length === 0) {
-      return res.status(400).json({ message: "At least one image is required." });
+    const imageFiles = Array.isArray(req.files?.images) ? req.files.images : [];
+    const videoFiles = Array.isArray(req.files?.videos) ? req.files.videos : [];
+
+    if (imageFiles.length === 0 && videoFiles.length === 0) {
+      return res.status(400).json({ message: "At least one image or video is required." });
     }
-    if (files.length > 5) {
+    if (imageFiles.length > 5) {
       return res.status(400).json({ message: "A product can have up to 5 images only." });
     }
 
-    const images = files
+    const images = imageFiles
       .map((f) => toUploadUrlFromFilename(f.filename))
       .filter(Boolean)
       .slice(0, 5);
+    const video = videoFiles[0] ? toUploadUrlFromFilename(videoFiles[0].filename) : "";
 
     const mainIdx = Number.isFinite(Number(mainNewIndex)) ? Number(mainNewIndex) : 0;
-    const mainImage = images[mainIdx] || images[0] || "";
-    if (!mainImage || !images.includes(mainImage)) {
+    const mainImage = images.length > 0 ? (images[mainIdx] || images[0] || "") : "";
+    if (images.length > 0 && (!mainImage || !images.includes(mainImage))) {
       return res.status(400).json({ message: "mainImage must be one of the images." });
     }
 
@@ -164,6 +168,7 @@ async function createProduct(req, res) {
       images,
       mainImage,
       image: mainImage, // legacy
+      video,
       category,
       isFeatured: String(isFeatured) === "true",
     });
@@ -197,10 +202,13 @@ async function updateProduct(req, res) {
       mainImage,
       mainNewIndex,
       existingImages,
+      existingVideo,
+      removeVideo,
     } = req.body;
 
     const keepImages = parseExistingImages(existingImages);
-    const newFiles = Array.isArray(req.files) ? req.files : [];
+    const newFiles = Array.isArray(req.files?.images) ? req.files.images : [];
+    const newVideoFiles = Array.isArray(req.files?.videos) ? req.files.videos : [];
 
     if (keepImages.length + newFiles.length > 5) {
       return res.status(400).json({ message: "A product can have up to 5 images only." });
@@ -212,28 +220,37 @@ async function updateProduct(req, res) {
 
     const nextImages = [...keepImages, ...uploadedUrls].slice(0, 5);
 
-    let nextMain = "";
-    if (mainImage) {
-      nextMain = String(mainImage);
-    } else if (mainNewIndex !== undefined && uploadedUrls.length > 0) {
-      const idx = Number(mainNewIndex);
-      nextMain = uploadedUrls[idx] || uploadedUrls[0] || "";
+    const shouldRemoveVideo = String(removeVideo || "").toLowerCase() === "true";
+    let nextVideo = "";
+    if (!shouldRemoveVideo) {
+      nextVideo = newVideoFiles[0]
+        ? toUploadUrlFromFilename(newVideoFiles[0].filename)
+        : String(existingVideo || "");
     }
 
-    // If not provided, keep current mainImage if still present; otherwise default to first.
+    let nextMain = "";
+    if (nextImages.length > 0) {
+      if (mainImage) {
+        nextMain = String(mainImage);
+      } else if (mainNewIndex !== undefined && uploadedUrls.length > 0) {
+        const idx = Number(mainNewIndex);
+        nextMain = uploadedUrls[idx] || uploadedUrls[0] || "";
+      }
+    }
+
     const current = await Product.findById(id);
     if (!current) {
       return res.status(404).json({ message: "Product not found" });
     }
-    if (!nextMain) {
+    if (nextImages.length > 0 && !nextMain) {
       const curMain = current.mainImage || current.image;
       nextMain = nextImages.includes(curMain) ? curMain : nextImages[0] || "";
     }
 
-    if (nextImages.length === 0) {
-      return res.status(400).json({ message: "At least one image is required." });
+    if (nextImages.length === 0 && !nextVideo) {
+      return res.status(400).json({ message: "At least one image or video is required." });
     }
-    if (!nextMain || !nextImages.includes(nextMain)) {
+    if (nextImages.length > 0 && (!nextMain || !nextImages.includes(nextMain))) {
       return res.status(400).json({ message: "mainImage must be one of the images." });
     }
 
@@ -251,6 +268,7 @@ async function updateProduct(req, res) {
       images: nextImages,
       mainImage: nextMain,
       image: nextMain, // legacy
+      video: nextVideo,
       ...(isFeatured !== undefined ? { isFeatured: String(isFeatured) === "true" } : {}),
     };
 
@@ -281,11 +299,10 @@ async function deleteProduct(req, res) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const urls = Array.isArray(product.images) && product.images.length
-      ? product.images
-      : product.image
-        ? [product.image]
-        : [];
+    const urls = [
+      ...(Array.isArray(product.images) && product.images.length ? product.images : product.image ? [product.image] : []),
+      ...(product.video ? [product.video] : []),
+    ];
 
     // Delete local uploaded files
     urls.forEach(deleteLocalUploadByUrl);

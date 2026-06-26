@@ -260,10 +260,14 @@
   place-items: center;
   padding: 18px;
   z-index: 50;
+  overflow-y: auto;
 }
 
 .modal {
   width: min(860px, 100%);
+  max-height: calc(100vh - 36px);
+  display: flex;
+  flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -324,6 +328,11 @@
   border: 1px solid rgba(34, 197, 94, 0.35);
   background: rgba(34, 197, 94, 0.08);
   color: var(--textStrong);
+}
+
+.modalBody {
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .form {
@@ -495,6 +504,24 @@
   height: 88px;
   object-fit: cover;
   display: block;
+}
+
+.videoPreviewCard {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.videoPreview {
+  width: 100%;
+  border-radius: 12px;
+  background: #000;
+  max-height: 220px;
+}
+
+.videoActions {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .thumbActions {

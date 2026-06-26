@@ -17,6 +17,7 @@ const productSchema = new mongoose.Schema(
       },
     },
     mainImage: { type: String, default: "" },
+    video: { type: String, default: "" },
     ratings: {
       type: [
         {
