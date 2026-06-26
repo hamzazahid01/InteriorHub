@@ -139,8 +139,9 @@ async function createProduct(req, res) {
       return res.status(400).json({ message: "category is required" });
     }
 
-    const imageFiles = Array.isArray(req.files?.images) ? req.files.images : [];
-    const videoFiles = Array.isArray(req.files?.videos) ? req.files.videos : [];
+    const uploadedFiles = Array.isArray(req.files) ? req.files : [];
+    const imageFiles = uploadedFiles.filter((file) => file?.mimetype?.startsWith("image/"));
+    const videoFiles = uploadedFiles.filter((file) => file?.mimetype?.startsWith("video/"));
 
     if (imageFiles.length === 0 && videoFiles.length === 0) {
       return res.status(400).json({ message: "At least one image or video is required." });
@@ -207,8 +208,9 @@ async function updateProduct(req, res) {
     } = req.body;
 
     const keepImages = parseExistingImages(existingImages);
-    const newFiles = Array.isArray(req.files?.images) ? req.files.images : [];
-    const newVideoFiles = Array.isArray(req.files?.videos) ? req.files.videos : [];
+    const uploadedFiles = Array.isArray(req.files) ? req.files : [];
+    const newFiles = uploadedFiles.filter((file) => file?.mimetype?.startsWith("image/"));
+    const newVideoFiles = uploadedFiles.filter((file) => file?.mimetype?.startsWith("video/"));
 
     if (keepImages.length + newFiles.length > 5) {
       return res.status(400).json({ message: "A product can have up to 5 images only." });
