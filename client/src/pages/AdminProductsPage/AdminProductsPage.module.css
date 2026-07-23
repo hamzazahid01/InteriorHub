@@ -247,6 +247,42 @@
   font-weight: 750;
 }
 
+.priceOptionsField {
+  grid-column: 1 / -1;
+}
+
+.priceOptionsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.priceOptionsHint {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.priceOptionsList {
+  display: grid;
+  gap: 10px;
+}
+
+.priceOptionRow {
+  display: grid;
+  grid-template-columns: 1fr 140px auto;
+  gap: 10px;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .priceOptionRow {
+    grid-template-columns: 1fr;
+  }
+}
+
 .empty {
   padding: 22px 14px;
   color: var(--muted);

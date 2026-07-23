@@ -188,6 +188,35 @@
   color: var(--textStrong);
 }
 
+.priceOptionsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.priceOptionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.priceOptionLabel {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.priceOptionAmount {
+  font-weight: 800;
+  color: var(--textStrong);
+}
+
 .descriptionBlock {
   margin: 0 0 18px;
   max-height: 220px;

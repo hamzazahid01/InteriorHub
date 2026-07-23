@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../../utils/api";
 import { resolveImageUrl } from "../../utils/images";
+import { formatProductPriceDisplay } from "../../utils/prices";
 import styles from "./AdminProductsPage.module.css";
 
 const emptyForm = {
   name: "",
-  price: "",
   description: "",
   category: "",
 };
+
+const emptyPriceOption = { label: "", price: "" };
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
@@ -18,6 +20,7 @@ export default function AdminProductsPage() {
   const [mode, setMode] = useState("create"); // create | edit
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
+  const [priceOptions, setPriceOptions] = useState([{ ...emptyPriceOption }]);
   const [existingImages, setExistingImages] = useState([]);
   const [existingVideo, setExistingVideo] = useState("");
   const [newFiles, setNewFiles] = useState([]);
@@ -65,6 +68,7 @@ export default function AdminProductsPage() {
     setMode("create");
     setEditingId(null);
     setForm(emptyForm);
+    setPriceOptions([{ ...emptyPriceOption }]);
     setExistingImages([]);
     setExistingVideo("");
     setNewFiles([]);
@@ -83,10 +87,17 @@ export default function AdminProductsPage() {
     setEditingId(p._id);
     setForm({
       name: p.name || "",
-      price: p.price ?? "",
       description: p.description || "",
       category: p.category?._id || "",
     });
+    setPriceOptions(
+      Array.isArray(p.priceOptions) && p.priceOptions.length
+        ? p.priceOptions.map((o) => ({
+            label: o.label || "",
+            price: o.price ?? "",
+          }))
+        : [{ label: "Standard", price: p.price ?? "" }]
+    );
     const imgs = Array.isArray(p.images) && p.images.length ? p.images : p.image ? [p.image] : [];
     setExistingImages(imgs);
     setExistingVideo(p.video || "");
@@ -107,6 +118,7 @@ export default function AdminProductsPage() {
     setFormOpen(false);
     setEditingId(null);
     setForm(emptyForm);
+    setPriceOptions([{ ...emptyPriceOption }]);
     setMode("create");
     setError("");
     setSuccess("");
@@ -174,13 +186,44 @@ export default function AdminProductsPage() {
     }
   }
 
+  function updatePriceOption(index, field, value) {
+    setPriceOptions((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
+    );
+  }
+
+  function addPriceOption() {
+    setPriceOptions((prev) => [...prev, { ...emptyPriceOption }]);
+  }
+
+  function removePriceOption(index) {
+    setPriceOptions((prev) => {
+      if (prev.length <= 1) return prev;
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (!form.name.trim() || form.price === "" || !form.category) {
-      setError("Name, price, and category are required.");
+    if (!form.name.trim() || !form.category) {
+      setError("Name and category are required.");
+      return;
+    }
+
+    const validPriceOptions = priceOptions
+      .map((row) => ({
+        label: row.label.trim(),
+        price: Number(row.price),
+      }))
+      .filter(
+        (row) => row.label && Number.isFinite(row.price) && row.price >= 0
+      );
+
+    if (validPriceOptions.length === 0) {
+      setError("Add at least one price with a label and amount.");
       return;
     }
 
@@ -196,7 +239,8 @@ export default function AdminProductsPage() {
 
     const fd = new FormData();
     fd.append("name", form.name.trim());
-    fd.append("price", String(form.price));
+    fd.append("price", String(Math.min(...validPriceOptions.map((o) => o.price))));
+    fd.append("priceOptions", JSON.stringify(validPriceOptions));
     fd.append("description", form.description.trim());
     fd.append("category", form.category);
     fd.append("existingImages", JSON.stringify(existingImages));
@@ -221,6 +265,7 @@ export default function AdminProductsPage() {
       await load();
       setSuccess(mode === "edit" ? "Product updated successfully." : "Product created successfully.");
       setForm(emptyForm);
+      setPriceOptions([{ ...emptyPriceOption }]);
       setExistingImages([]);
       setExistingVideo("");
       setNewFiles([]);
@@ -252,6 +297,15 @@ export default function AdminProductsPage() {
     try {
       const fd = new FormData();
       fd.append("isFeatured", String(!p.isFeatured));
+      fd.append("price", String(p.price ?? 0));
+      fd.append(
+        "priceOptions",
+        JSON.stringify(
+          Array.isArray(p.priceOptions) && p.priceOptions.length
+            ? p.priceOptions
+            : [{ label: "Standard", price: p.price ?? 0 }]
+        )
+      );
       fd.append("existingImages", JSON.stringify(p.images && p.images.length ? p.images : p.image ? [p.image] : []));
       fd.append("existingVideo", p.video || "");
       fd.append("mainImage", p.mainImage || p.image || "");
@@ -292,7 +346,7 @@ export default function AdminProductsPage() {
               <div className={styles.mobileTitleWrap}>
                 <div className={styles.mobileTitle}>{p.name}</div>
                 <div className={styles.mobileSub}>
-                  {p.category?.name || "—"} • {aed.format(p.price)}
+                  {p.category?.name || "—"} • {formatProductPriceDisplay(p, aed)}
                 </div>
               </div>
               <div className={styles.mobileThumb}>
@@ -354,7 +408,7 @@ export default function AdminProductsPage() {
                   <div className={styles.smallMuted}>{p._id}</div>
                 </td>
                 <td>{p.category?.name || "—"}</td>
-                <td className={styles.priceCell}>{aed.format(p.price)}</td>
+                <td className={styles.priceCell}>{formatProductPriceDisplay(p, aed)}</td>
                 <td className={styles.featuredCell}>
                   <button
                     className={styles.pillBtn}
@@ -432,24 +486,54 @@ export default function AdminProductsPage() {
                   />
                 </div>
 
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="p-price">
-                    Price (AED)
-                  </label>
-                  <input
-                    id="p-price"
-                    className={styles.input}
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={form.price}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, price: e.target.value }))
-                    }
-                    placeholder="1200"
-                    required
-                    disabled={saving}
-                  />
+                <div className={`${styles.field} ${styles.priceOptionsField}`}>
+                  <div className={styles.priceOptionsHeader}>
+                    <label className={styles.label}>Price Options (AED)</label>
+                    <button
+                      type="button"
+                      className={styles.smallBtn}
+                      onClick={addPriceOption}
+                      disabled={saving}
+                    >
+                      + Add Price
+                    </button>
+                  </div>
+                  <p className={styles.priceOptionsHint}>
+                    Add labels like Small, Medium, Large — or anything you prefer.
+                  </p>
+                  <div className={styles.priceOptionsList}>
+                    {priceOptions.map((row, idx) => (
+                      <div key={idx} className={styles.priceOptionRow}>
+                        <input
+                          className={styles.input}
+                          value={row.label}
+                          onChange={(e) => updatePriceOption(idx, "label", e.target.value)}
+                          placeholder="e.g. Small"
+                          disabled={saving}
+                          aria-label={`Price label ${idx + 1}`}
+                        />
+                        <input
+                          className={styles.input}
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={row.price}
+                          onChange={(e) => updatePriceOption(idx, "price", e.target.value)}
+                          placeholder="Amount"
+                          disabled={saving}
+                          aria-label={`Price amount ${idx + 1}`}
+                        />
+                        <button
+                          type="button"
+                          className={`${styles.smallBtn} ${styles.dangerBtn}`}
+                          onClick={() => removePriceOption(idx)}
+                          disabled={saving || priceOptions.length <= 1}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className={styles.field}>

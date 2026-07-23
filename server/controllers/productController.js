@@ -28,6 +28,33 @@ function parseExistingImages(value) {
   }
 }
 
+function parsePriceOptions(value) {
+  if (!value) return [];
+  let raw = value;
+  if (typeof value === "string") {
+    try {
+      raw = JSON.parse(value);
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => ({
+      label: String(item?.label || "").trim(),
+      price: Number(item?.price),
+    }))
+    .filter((item) => item.label && Number.isFinite(item.price) && item.price >= 0);
+}
+
+function syncPriceFromOptions(priceOptions, fallbackPrice) {
+  if (Array.isArray(priceOptions) && priceOptions.length) {
+    return Math.min(...priceOptions.map((o) => o.price));
+  }
+  const n = Number(fallbackPrice);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
 function toUploadUrlFromFilename(filename) {
   return filename ? `/uploads/${filename}` : "";
 }
@@ -66,7 +93,7 @@ async function getProducts(req, res) {
     const wantsPaged = page !== undefined || limit !== undefined;
 
     const baseQuery = Product.find(filter)
-      .select("name price description images mainImage image video category isFeatured averageRating createdAt")
+      .select("name price priceOptions description images mainImage image video category isFeatured averageRating createdAt")
       .populate("category", "name")
       .sort({ createdAt: -1 });
 
@@ -129,10 +156,16 @@ async function getProductById(req, res) {
 
 async function createProduct(req, res) {
   try {
-    const { name, price, description, category, isFeatured, mainNewIndex } = req.body;
+    const { name, price, priceOptions, description, category, isFeatured, mainNewIndex } = req.body;
 
-    if (!name || price === undefined) {
-      return res.status(400).json({ message: "name and price are required" });
+    if (!name) {
+      return res.status(400).json({ message: "name is required" });
+    }
+
+    const parsedPriceOptions = parsePriceOptions(priceOptions);
+    const resolvedPrice = syncPriceFromOptions(parsedPriceOptions, price);
+    if (!parsedPriceOptions.length && price === undefined) {
+      return res.status(400).json({ message: "At least one price is required." });
     }
 
     if (!category || !mongoose.Types.ObjectId.isValid(category)) {
@@ -164,7 +197,8 @@ async function createProduct(req, res) {
 
     const product = await Product.create({
       name: name.trim(),
-      price: Number(price),
+      price: resolvedPrice,
+      priceOptions: parsedPriceOptions,
       description: (description || "").trim(),
       images,
       mainImage,
@@ -197,6 +231,7 @@ async function updateProduct(req, res) {
     const {
       name,
       price,
+      priceOptions,
       description,
       category,
       isFeatured,
@@ -206,6 +241,9 @@ async function updateProduct(req, res) {
       existingVideo,
       removeVideo,
     } = req.body;
+
+    const parsedPriceOptions =
+      priceOptions !== undefined ? parsePriceOptions(priceOptions) : undefined;
 
     const keepImages = parseExistingImages(existingImages);
     const uploadedFiles = Array.isArray(req.files) ? req.files : [];
@@ -260,9 +298,17 @@ async function updateProduct(req, res) {
       return res.status(400).json({ message: "Invalid category id" });
     }
 
+    const nextPriceOptions =
+      parsedPriceOptions !== undefined ? parsedPriceOptions : current.priceOptions;
+    const resolvedPrice =
+      parsedPriceOptions !== undefined || price !== undefined
+        ? syncPriceFromOptions(nextPriceOptions, price !== undefined ? price : current.price)
+        : undefined;
+
     const update = {
       ...(name !== undefined ? { name: String(name).trim() } : {}),
-      ...(price !== undefined ? { price: Number(price) } : {}),
+      ...(resolvedPrice !== undefined ? { price: resolvedPrice } : {}),
+      ...(parsedPriceOptions !== undefined ? { priceOptions: parsedPriceOptions } : {}),
       ...(description !== undefined
         ? { description: String(description).trim() }
         : {}),

@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { resolveImageUrl } from "../../utils/images";
 import { pageMeta, productImageAlt } from "../../utils/seo";
+import { formatProductPriceDisplay, getProductPriceOptions } from "../../utils/prices";
 import styles from "./ProductDetailPage.module.css";
 
 export default function ProductDetailPage() {
@@ -334,7 +335,7 @@ export default function ProductDetailPage() {
             <span className={styles.badge}>
               {product.category?.name || "Uncategorized"}
             </span>
-            <span className={styles.price}>{aed.format(product.price)}</span>
+            <span className={styles.price}>{formatProductPriceDisplay(product, aed)}</span>
           </p>
 
           <div className={styles.ratingRow}>
@@ -361,7 +362,20 @@ export default function ProductDetailPage() {
               </div>
               <div className={styles.row}>
                 <dt>Price</dt>
-                <dd>{aed.format(product.price)}</dd>
+                <dd>
+                  {getProductPriceOptions(product).length > 1 ? (
+                    <ul className={styles.priceOptionsList}>
+                      {getProductPriceOptions(product).map((opt, idx) => (
+                        <li key={`${opt.label}-${idx}`} className={styles.priceOptionItem}>
+                          <span className={styles.priceOptionLabel}>{opt.label}</span>
+                          <span className={styles.priceOptionAmount}>{aed.format(opt.price)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    aed.format(product.price)
+                  )}
+                </dd>
               </div>
             </dl>
           </div>

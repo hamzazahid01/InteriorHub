@@ -4,6 +4,15 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
+    priceOptions: {
+      type: [
+        {
+          label: { type: String, required: true, trim: true },
+          price: { type: Number, required: true, min: 0 },
+        },
+      ],
+      default: [],
+    },
     description: { type: String, default: "" },
     // Backward-compatible single image (kept so existing UI/API doesn't break).
     // Going forward, prefer `mainImage` and `images`.

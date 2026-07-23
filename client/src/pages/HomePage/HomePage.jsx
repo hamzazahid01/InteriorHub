@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { resolveImageUrl } from "../../utils/images";
 import { pageMeta, productImageAlt } from "../../utils/seo";
+import { formatProductPriceShort } from "../../utils/prices";
 import styles from "./HomePage.module.css";
 
 export default function HomePage() {
@@ -173,7 +174,7 @@ export default function HomePage() {
               <div className={styles.cardBody}>
                 <div className={styles.cardTop}>
                   <div className={styles.name}>{p.name}</div>
-                  <div className={styles.price}>{aed.format(p.price)}</div>
+                  <div className={styles.price}>{formatProductPriceShort(p, aed)}</div>
                 </div>
                 <div className={styles.meta}>
                   {p.category?.name ? p.category.name : "—"}
@@ -217,7 +218,7 @@ export default function HomePage() {
                 <div className={styles.cardBody}>
                   <div className={styles.cardTop}>
                     <div className={styles.name}>{p.name}</div>
-                    <div className={styles.price}>{aed.format(p.price)}</div>
+                    <div className={styles.price}>{formatProductPriceShort(p, aed)}</div>
                   </div>
                   <div className={styles.meta}>{p.category?.name ? p.category.name : "—"}</div>
                 </div>

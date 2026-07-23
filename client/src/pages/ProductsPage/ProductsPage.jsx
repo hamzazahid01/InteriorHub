@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import ProductCard from "../../components/ProductCard/ProductCard";
 import { pageMeta } from "../../utils/seo";
+import { formatProductPriceShort } from "../../utils/prices";
 import styles from "./ProductsPage.module.css";
 
 export default function ProductsPage() {
@@ -169,7 +170,7 @@ export default function ProductsPage() {
 
       <section className={styles.grid} aria-label="Product grid">
         {products.map((p) => (
-          <ProductCard key={p._id} product={p} priceText={aed.format(p.price)} />
+          <ProductCard key={p._id} product={p} priceText={formatProductPriceShort(p, aed)} />
         ))}
       </section>
 
