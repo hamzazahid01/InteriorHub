@@ -3,8 +3,8 @@ import { pageMeta } from "../../utils/seo";
 import styles from "./ContactPage.module.css";
 
 export default function ContactPage() {
-  const phoneDisplay = "+971503892838";
-  const whatsappNumber = "971503892838";
+  const phoneDisplay = "+971559751474";
+  const whatsappNumber = "971559751474";
   const whatsappMessage =
     "Hello, I would like to inquire about your products and services.";
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(

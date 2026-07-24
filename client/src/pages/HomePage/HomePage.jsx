@@ -54,7 +54,7 @@ export default function HomePage() {
     };
   }, []);
 
-  const whatsappNumber = "971503892838";
+  const whatsappNumber = "971559751474";
   const whatsappMessage = "Hello, I am interested in InteriorHub services.";
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     whatsappMessage

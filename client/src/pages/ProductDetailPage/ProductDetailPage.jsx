@@ -143,7 +143,7 @@ export default function ProductDetailPage() {
     }
   }
 
-  const whatsappNumber = "971503892838";
+  const whatsappNumber = "971559751474";
   const whatsappMessage = `Hello, I am interested in the product: ${product.name}. Could you please share more details?`;
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     whatsappMessage
@@ -444,7 +444,7 @@ export default function ProductDetailPage() {
                   type="tel"
                   value={form.phone}
                   onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                  placeholder="+971503892838"
+                  placeholder="+971559751474"
                   required
                   disabled={submitStatus === "sending"}
                 />
