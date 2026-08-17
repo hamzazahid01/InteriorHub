@@ -13,10 +13,13 @@ import RequireAdmin from "./components/RequireAdmin/RequireAdmin";
 import PublicLayout from "./layouts/PublicLayout";
 import AdminAuthLayout from "./layouts/AdminAuthLayout";
 import "./App.css";
+import FloatingContact from "./components/FloatingContact/FloatingContact";
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <FloatingContact />
+      <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/contact" element={<ContactPage />} />
@@ -39,6 +42,7 @@ export default function App() {
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </>
   );
 }
